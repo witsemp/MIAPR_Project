@@ -51,12 +51,13 @@ class RRT():
         in_free_space = True
         div_x = 1
         div_y = 1
+        div = 20
         if (a[0] != b[0]):
             a_v = (a[1]-b[1])/(a[0]-b[0])
             b_v = a[1] - a_v * a[0]
-            step_x = np.abs((b[0] - a[0]) / 10)
+            step_x = np.abs((b[0] - a[0]) / div)
             x = min(a[0], b[0])
-            for i in range(0, 10):
+            for i in range(0, div):
                 y = a_v * x + b_v
                 x_int = int(x * div_x)
                 y_int = int(y * div_y)
@@ -66,9 +67,9 @@ class RRT():
                         break
                 x = x + step_x
         else:
-            step_y = np.abs((b[1] - a[1]) / 10)
+            step_y = np.abs((b[1] - a[1]) / div)
             y = min(a[1], b[1])
-            for i in range(0, 10):
+            for i in range(0, div):
                 if y < self.height:
                     if self.map[int(y*div_y), int(a[0] * div_x)] == 0:
                         in_free_space = False
@@ -90,22 +91,22 @@ class RRT():
             closestNeigh = self.find_closest(newPoint)
             newPointSegment = self.new_pt(newPoint, closestNeigh)
             if self.check_if_valid(newPointSegment, closestNeigh):
-                self.parent.update({tuple(newPointSegment) : tuple(closestNeigh)})
+                self.parent.update({tuple(newPointSegment): tuple(closestNeigh)})
             else:
                 continue
             if self.check_if_valid(newPointSegment, self.goal):
-                self.parent.update({self.goal : tuple(newPointSegment)})
+                self.parent.update({self.goal: tuple(newPointSegment)})
                 considered_node = self.goal
                 path.append(considered_node)
-                start_reached = False
-                while not start_reached:
+                startReached = False
+                while not startReached:
                     print('Considered node: ' + str(considered_node))
                     print('Goal: ' + str(self.goal))
                     print(self.parent)
                     considered_node = tuple(self.parent[considered_node])
                     path.append(considered_node)
                     if considered_node[0] == self.start[0] and considered_node[1] == self.start[1]:
-                        start_reached = True
+                        startReached = True
                 endReached = True
         for object in path:
             object = list(object)
