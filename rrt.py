@@ -13,11 +13,8 @@ class RRT():
         self.parent[self.start] = None
 
     def random_point(self):
-
-
         x = int(self.width * np.random.random_sample())
         y = int(self.height * np.random.random_sample())
-        print(np.array([x, y]))
         return np.array([x, y])
 
     def find_closest(self, pos):
@@ -100,15 +97,16 @@ class RRT():
 
             if self.check_if_valid(newPointSegment, self.goal):
                 self.parent.update({self.goal : newPointSegment})
-                print(self.parent.items())
                 considered_node = self.goal
                 start_reached = False
                 path.append(considered_node)
                 while not start_reached:
-                    considered_node = tuple(self.parent[considered_node])
-                    path.append(considered_node)
-                    if considered_node[0] == self.start[0] and considered_node[1] == self.start[1]:
-                        start_reached = True
+                    if considered_node in self.parent.keys():
+                        considered_node = tuple(self.parent[considered_node])
+                        path.append(considered_node)
+                        if considered_node[0] == self.start[0] and considered_node[1] == self.start[1]:
+                            start_reached = True
+                    else: continue
 
                 endReached = True
                 for object in path:
@@ -118,7 +116,7 @@ class RRT():
                     object = tuple(object)
                     new_path.append(object)
                 print("Path found")
-                print(new_path)
+                print("New path: " + str(new_path))
             # else:
             #     print("Connection not found")
-        return new_path
+        return new_path, self.parent
