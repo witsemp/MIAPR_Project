@@ -74,15 +74,23 @@ def process_obs(obs):
     # cv.imshow('thresh', obs_thresh)
     return obs_thresh, start_point, end_point
 
-def draw_path(points):
+def draw_path(points, graph):
     obs_rgb = cv.imread('obs.png', 1)
     obs_rgb = obs_rgb[0:84, 0:96, :]
     obs_rgb = cv.resize(obs_rgb, (1000, 700))
     # cv.imwrite('rgb_resized.png', obs_rgb)
-    for point in points:
-        obs_rgb[point[1]:point[1]+5, point[0]:point[0]+5, 0] = 255
-        obs_rgb[point[1]:point[1]+5, point[0]:point[0]+5, 1] = 0
-        obs_rgb[point[1]:point[1]+5, point[0]:point[0]+5, 2] = 0
+    for key, value in graph.items():
+        obs_rgb[key[1]:key[1]+5, key[0]:key[0]+5, 0] = 0
+        obs_rgb[key[1]:key[1]+5, key[0]:key[0]+5, 1] = 0
+        obs_rgb[key[1]:key[1]+5, key[0]:key[0]+5, 2] = 255
+    # for point in points:
+    #     obs_rgb[point[1]:point[1]+5, point[0]:point[0]+5, 0] = 255
+    #     obs_rgb[point[1]:point[1]+5, point[0]:point[0]+5, 1] = 0
+    #     obs_rgb[point[1]:point[1]+5, point[0]:point[0]+5, 2] = 0
+    a = np.array(points)
+    # cv.drawContours(obs_rgb, [a], 0, (255, 0, 0), 2)
+    for point1, point2 in zip(a, a[1:]):
+        cv.line(obs_rgb, tuple(point1), tuple(point2), [255, 0, 0], 2)
     cv.imshow('hehe', obs_rgb)
 
 
@@ -95,15 +103,13 @@ while render < 5000:
     env.render()
     action = [0, 0.01, 0]
     print("Render no: " + str(render))
-    print("Action taken: " + str(action))
     print("--------------------------------")
     observation, reward, done, info = env.step(action)
-    if render > 30:
+    if render > 50:
         thresh, start_point, goal_point = process_obs(observation)
         RRT = rrt.RRT(thresh, start_point, goal_point)
-        path = RRT.search()
-        draw_path(path)
-
+        path, graph = RRT.search()
+        draw_path(path, graph)
         print("-----------------------------------------------------")
 env.close()
 
