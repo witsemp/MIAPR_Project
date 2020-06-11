@@ -10,7 +10,7 @@ class RRT():
         self.goal_state = goal_state
         self.vertices = {self.start_state: {'Parent': None, 'Control': initial_control}}
         self.delta_t = 10
-        self.T = 20
+        self.T = 10
         self.L = 50
         self.U = self.discrete_controls()
 
