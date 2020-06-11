@@ -60,8 +60,8 @@ class RRT():
         return (v_lin, turn_angle)
 
     def new_state(self, u, xk):
-        x_new = u[0]*np.cos(xk[2])*self.delta_t+xk[0]
-        y_new = xk[1] - u[0]*np.sin(xk[2])*self.delta_t
+        x_new = u[0]*np.sin(xk[2])*self.delta_t+xk[0]
+        y_new = xk[1] - u[0]*np.cos(xk[2])*self.delta_t
         theta_new = (u[0]/self.L)*np.tan(u[1])*self.delta_t+xk[2]
         new_state = (int(x_new), int(y_new), theta_new)
         return new_state
@@ -95,6 +95,7 @@ class RRT():
         startReached = False
         prox = 50
         path = []
+        controls = []
         while not endReached:
             xrand = self.random_state()
             xnear = self.find_closest_state(xrand)
@@ -117,11 +118,12 @@ class RRT():
         while not startReached:
             considered_node = self.vertices[considered_node]['Parent']
             path.append(considered_node)
+            controls.append(self.vertices[considered_node]['Control'])
             if considered_node[0] == self.start_state[0] and considered_node[1] == self.start_state[1]:
                 startReached = True
-
         path_to_draw = [(i[0], i[1]) for i in path]
         all_points = [(i[0], i[1]) for i in self.vertices.keys()]
-        print(path_to_draw)
-        return path_to_draw, all_points
+        controls.reverse()
+
+        return path_to_draw, all_points, controls
 
