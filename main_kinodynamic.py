@@ -29,6 +29,7 @@ def process_obs(obs):
 
     # resize to match game window size
     obs_thresh = cv.resize(obs_thresh, (1000, 700))
+    cv.imwrite('thresh.png', obs_thresh)
 
     # count white pixels on image borders
     for col in range(np.shape(obs_thresh)[1]):
@@ -103,7 +104,7 @@ render = 0
 while render < 5000:
     render = render + 1
     env.render()
-    action = [0, 0.1, 0.0]
+    action = [0, 0.25, 0.0]
     print("Render no: " + str(render))
     observation, reward, done, info = env.step(action)
     if render >= 50:
