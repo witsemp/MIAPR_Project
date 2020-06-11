@@ -93,14 +93,14 @@ class RRT():
     def search(self):
         endReached = False
         startReached = False
-        prox = 50
+        prox = 150
         path = []
         controls = []
         while not endReached:
             xrand = self.random_state()
             xnear = self.find_closest_state(xrand)
             xnew = self.extend(xnear, xrand)
-            if len(self.vertices) > 75:
+            if len(self.vertices) > 100:
                 self.vertices.clear()
                 path.append((self.start_state[0], self.start_state[1]))
                 path.append((self.goal_state[0], self.goal_state[1]))
