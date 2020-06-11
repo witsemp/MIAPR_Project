@@ -99,19 +99,23 @@ def draw_goal_state(goal_state):
     cv.imshow('hehe', obs_rgb)
 
 env = gym.make('CarRacing-v0')
-env.reset()
+observation = env.reset()
 render = 0
+action = [0, 0.1, 0.0]
 while render < 5000:
     render = render + 1
-    env.render()
-    action = [0, 0.25, 0.0]
     print("Render no: " + str(render))
-    observation, reward, done, info = env.step(action)
+    env.render()
+    if render < 50:
+        observation, reward, done, info = env.step(action)
     if render >= 50:
         thresh, start_state, goal_state = process_obs(observation)
         rrt = RRT(thresh, start_state, goal_state, (action[1], action[0]))
-        path, points = rrt.search()
+        path, points, controls = rrt.search()
+        if len(controls) != 0:
+            action = [controls[1][1], controls[1][0], 0]
         draw_points(path, goal_state, points)
+        observation, reward, done, info = env.step(action)
         print("-----------------------------------------------------")
 env.close()
 
