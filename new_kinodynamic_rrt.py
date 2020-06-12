@@ -100,7 +100,7 @@ class RRT():
             xrand = self.random_state()
             xnear = self.find_closest_state(xrand)
             xnew = self.extend(xnear, xrand)
-            if len(self.vertices) > 80:
+            if len(self.vertices) > 50:
                 self.vertices.clear()
                 path.append((self.start_state[0], self.start_state[1]))
                 path.append((self.goal_state[0], self.goal_state[1]))
