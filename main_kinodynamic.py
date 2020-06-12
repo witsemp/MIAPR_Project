@@ -20,7 +20,7 @@ def process_obs(obs):
     # resize to match game window size
     obs_thresh = cv.resize(obs_thresh, (1000, 700))
     # cv.imwrite('thresh.png', obs_thresh)
-    goal_point = skeletonize(obs_thresh)
+    goal_point = skeletonize(obs_thresh.copy())
     # obs_thresh = cv.dilate(obs_thresh, np.zeros((5, 5), dtype=np.uint8), iterations=40)
     goal_state = (round(goal_point[1]), round(goal_point[0]), 0)
     print(goal_state)
@@ -73,14 +73,31 @@ while render < 5000:
         thresh, start_state, goal_state = process_obs(observation)
         rrt = RRT(thresh, start_state, goal_state, (action[1], action[0]))
         path, points, controls = rrt.search()
-        if len(controls) != 0:
+        if len(controls) > 1:
+            print(len(controls))
+            print(controls)
             action = [controls[1][1]/(np.pi/4), controls[1][0], 0]
-            if action[1] > 0.2:
+            if action[1] > 0.6:
                 action[1] = 0.2
             if action[0] > 0.5:
-                action[0] = 0.5
+                action[2] = 0.25
             if action[0] < -0.5:
-                action[0] = -0.5
+                action[2] = 0.25
+        if len(controls) == 1:
+            print(len(controls))
+            print(controls)
+            action = [controls[0][1]/(np.pi/4), controls[0][0], 0]
+            if action[1] > 0.6:
+                action[1] = 0.2
+            if action[0] > 0.5:
+                action[2] = 0.25
+            if action[0] < -0.5:
+                action[2] = 0.25
+        if len(controls) == 0:
+            action = [0, 0, 0.05]
+
+
+
         print(action)
         draw_points(path, goal_state, points)
         observation, reward, done, info = env.step(action)
