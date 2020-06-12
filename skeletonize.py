@@ -1,63 +1,55 @@
 # Import the necessary libraries
-import cv2
+import cv2 as cv
 import numpy as np
 
 def skeletonize(image):
-    # img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # ret, img = cv2.threshold(img, 127, 255, 0)
+    # img = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    # ret, img = cv.threshold(img, 127, 255, 0)
+    goal_point = [300, 500]
     img = image
     wh_pixels_up = []
     wh_pixels_left = []
     wh_pixels_right = []
     thresh_erode = img.copy()
-    size = np.size(img)
     skel = np.zeros(img.shape, np.uint8)
-    element = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
+    element = cv.getStructuringElement(cv.MORPH_CROSS, (3, 3))
     while True:
-        open = cv2.morphologyEx(img, cv2.MORPH_OPEN, element)
-        temp = cv2.subtract(img, open)
-        eroded = cv2.erode(img, element)
-        skel = cv2.bitwise_or(skel, temp)
+        open = cv.morphologyEx(img, cv.MORPH_OPEN, element)
+        temp = cv.subtract(img, open)
+        eroded = cv.erode(img, element)
+        skel = cv.bitwise_or(skel, temp)
         img = eroded.copy()
-        if cv2.countNonZero(img) == 0:
+        if cv.countNonZero(img) == 0:
             break
-    thresh_erode = cv2.erode(thresh_erode, np.ones((7, 7), dtype=np.uint8), iterations=20)
-    out = cv2.bitwise_and(skel, thresh_erode)
-    out1 = cv2.threshold(out, 127, 255, cv2.THRESH_BINARY_INV)
-    for col in range(np.shape(out)[1]):
-        if out[0][col] != 0:
-            wh_pixels_up.append((0, col))
-    for row in range(np.shape(out)[0]):
-        if out[row][0] != 0:
-            wh_pixels_left.append((row, 0))
-    for row in range(np.shape(out)[0]):
-        if out[row][np.shape(out)[0]-1] != 0:
-            wh_pixels_right.append((row, 0))
+    thresh_erode = cv.erode(thresh_erode, np.ones((7, 7), dtype=np.uint8), iterations=20)
+    out = cv.bitwise_and(skel, thresh_erode)
+    # out = out[300:600, 350:650]
+
+    for row in range(300, 601):
+        if out[row][350] != 0:
+            wh_pixels_left.append((row, 350))
+    for row in range(300, 601):
+        if out[row][650] != 0:
+            wh_pixels_right.append((row, 650))
+    for col in range(350, 651):
+        if out[300][col] != 0:
+            wh_pixels_up.append((300, col))
 
     # find goal point
-    if len(wh_pixels_up) > 0:
+    if len(wh_pixels_up) > 0 and len(wh_pixels_left) == 0 and len(wh_pixels_right) == 0:
         goal_point = wh_pixels_up[0]
-        goal_point = list(goal_point)
-        goal_point[0] = goal_point[0] + np.shape(image)[0]/2
-        goal_point = tuple(goal_point)
-        # print("Goal point" + str(goal_point))
-
-    if len(wh_pixels_left) > 0:
-        goal_point = wh_pixels_left[0]
-        goal_point = list(goal_point)
-        goal_point[1] = goal_point[1] + np.shape(image)[1]/35
-        goal_point = tuple(goal_point)
         # print("Goal point" + str(goal_point))
 
     if len(wh_pixels_right) > 0:
         goal_point = wh_pixels_right[0]
-        goal_point = list(goal_point)
-        goal_point[1] = goal_point[1] + np.shape(image)[1]/35
-        goal_point = tuple(goal_point)
         # print("Goal point" + str(goal_point))
 
-    cv2.imshow('skel', out)
-    # cv2.imshow('ihohio', out1)
+    if len(wh_pixels_left) > 0:
+        goal_point = wh_pixels_left[0]
+        # print("Goal point" + str(goal_point))
+
+    cv.imshow('skel', out)
+    # cv.imshow('ihohio', out1)
 
 
 
