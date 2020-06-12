@@ -77,22 +77,26 @@ while render < 5000:
             print(len(controls))
             print(controls)
             action = [controls[1][1]/(np.pi/4), controls[1][0], 0]
-            if action[1] > 0.6:
-                action[1] = 0.2
+            if action[1] > 0.5:
+                action[1] = 0.3
             if action[0] > 0.5:
-                action[2] = 0.25
+                action[1] = 0
+                action[2] = 0.1
             if action[0] < -0.5:
-                action[2] = 0.25
+                action[1] = 0
+                action[2] = 0.1
         if len(controls) == 1:
             print(len(controls))
             print(controls)
             action = [controls[0][1]/(np.pi/4), controls[0][0], 0]
-            if action[1] > 0.6:
-                action[1] = 0.2
+            if action[1] > 0.5:
+                action[1] = 0.3
             if action[0] > 0.5:
-                action[2] = 0.25
+                action[1] = 0
+                action[2] = 0.1
             if action[0] < -0.5:
-                action[2] = 0.25
+                action[1] = 0
+                action[2] = 0.1
         if len(controls) == 0:
             action = [0, 0, 0.05]
 
