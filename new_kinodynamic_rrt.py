@@ -62,7 +62,7 @@ class RRT():
     def new_state(self, u, xk):
         x_new = u[0]*np.sin(xk[2])*self.delta_t+xk[0]
         y_new = xk[1] - u[0]*np.cos(xk[2])*self.delta_t
-        theta_new = (u[0]/self.L)*np.tan(u[1])*self.delta_t+xk[2]
+        theta_new = (u[0]/self.L)*np.tan(u[1])*self.delta_t + xk[2]
         new_state = (int(x_new), int(y_new), theta_new)
         return new_state
 
@@ -108,7 +108,6 @@ class RRT():
                 break
             if xnew is not None:
                 if self.calculate_metrics(xnew, self.goal_state, 20) <= prox:
-                    print("HEHEHEHE")
                     self.vertices[xnew] = {}
                     self.vertices[xnew]['Parent'] = xnear
                     self.vertices[xnew]['Control'] = (0, 0)
