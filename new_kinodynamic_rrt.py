@@ -1,5 +1,4 @@
 import numpy as np
-import itertools
 import math
 class RRT():
     def __init__(self, map, start_state, goal_state, initial_control):
@@ -10,9 +9,8 @@ class RRT():
         self.goal_state = goal_state
         self.vertices = {self.start_state: {'Parent': None, 'Control': initial_control}}
         self.delta_t = 10
-        self.T = 10
+        self.T = 100
         self.L = 50
-        self.U = self.discrete_controls()
 
     def random_state(self):
         x = int(self.width * np.random.random_sample())
@@ -34,11 +32,6 @@ class RRT():
         return metrics
 
 
-    '''
-    TODO
-    check metrics
-    '''
-
     def find_closest_state(self, pos):
         metrics_min = math.sqrt(self.width ** 2 + self.height ** 2)
         for key in self.vertices.keys():
@@ -47,12 +40,6 @@ class RRT():
                 closest = key
                 metrics_min = metrics
         return closest
-
-    def discrete_controls(self):
-        V_lin = [i/10 for i in range(1, 11)]
-        Turn_angle = [i/10*np.pi/4 for i in range(-10, 11)]
-        product = [(a, b) for a, b in itertools.product(V_lin, Turn_angle)]
-        return product
 
     def random_control(self):
         v_lin = np.random.random_sample()
@@ -66,20 +53,16 @@ class RRT():
         new_state = (int(x_new), int(y_new), theta_new)
         return new_state
 
-    '''
-    Stan Trapped???
-    '''
-
     def extend(self, xnear, xrand):
         metrics_ref = 25
         metrics_max = self.calculate_metrics(xnear, xrand, 20)
         current_state = xnear
         u = self.random_control()
-        for iter in range(0, self.T):
+        for iter in range(0, int(self.T/self.delta_t)):
             x_new = self.new_state(u, current_state)
             if self.check_if_valid(x_new):
                 if self.calculate_metrics(x_new, xrand, 20) < metrics_max:
-                    if self.calculate_metrics(x_new, xrand, 20) <= metrics_ref or iter == self.T - 1:
+                    if self.calculate_metrics(x_new, xrand, 20) <= metrics_ref or iter == self.T/self.delta_t - 1:
                         self.vertices[x_new] = {}
                         self.vertices[x_new]['Parent'] = xnear
                         self.vertices[x_new]['Control'] = u
@@ -97,13 +80,15 @@ class RRT():
         path = []
         controls = []
         while not endReached:
+            if not self.check_if_valid(self.start_state):
+                break
             xrand = self.random_state()
             xnear = self.find_closest_state(xrand)
             xnew = self.extend(xnear, xrand)
             if len(self.vertices) > 50:
                 self.vertices.clear()
-                path.append((self.start_state[0], self.start_state[1]))
-                path.append((self.goal_state[0], self.goal_state[1]))
+                path.append((self.start_state[0], self.start_state[1], 0))
+                path.append((self.goal_state[0], self.goal_state[1], 0))
                 startReached = True
                 break
             if xnew is not None:
@@ -121,8 +106,9 @@ class RRT():
             if considered_node[0] == self.start_state[0] and considered_node[1] == self.start_state[1]:
                 startReached = True
         path_to_draw = [(i[0], i[1]) for i in path]
+        angles = [i[2] for i in path]
         all_points = [(i[0], i[1]) for i in self.vertices.keys()]
         controls.reverse()
 
-        return path_to_draw, all_points, controls
+        return path_to_draw, all_points, controls, angles
 
