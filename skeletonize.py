@@ -1,10 +1,8 @@
-# Import the necessary libraries
+
 import cv2 as cv
 import numpy as np
 
 def skeletonize(image):
-    # img = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-    # ret, img = cv.threshold(img, 127, 255, 0)
     goal_point = [300, 500]
     img = image
     wh_pixels_up = []
@@ -23,7 +21,6 @@ def skeletonize(image):
             break
     thresh_erode = cv.erode(thresh_erode, np.ones((7, 7), dtype=np.uint8), iterations=20)
     out = cv.bitwise_and(skel, thresh_erode)
-    # out = out[300:600, 350:650]
 
     for row in range(300, 601):
         if out[row][350] != 0:
@@ -38,20 +35,12 @@ def skeletonize(image):
     # find goal point
     if len(wh_pixels_up) > 0 and len(wh_pixels_left) == 0 and len(wh_pixels_right) == 0:
         goal_point = wh_pixels_up[0]
-        # print("Goal point" + str(goal_point))
 
     if len(wh_pixels_right) > 0:
         goal_point = wh_pixels_right[0]
-        # print("Goal point" + str(goal_point))
 
     if len(wh_pixels_left) > 0:
         goal_point = wh_pixels_left[0]
-        # print("Goal point" + str(goal_point))
-
-    cv.imshow('skel', out)
-    # cv.imshow('ihohio', out1)
-
-
 
     wh_pixels_left.clear()
     wh_pixels_right.clear()
